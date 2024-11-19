@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bolt-ai-development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bolt-ai-development
+  template:
+    metadata:
+      labels:
+        app: bolt-ai-development
+    spec:
+      containers:
+      - name: bolt-ai-dev
+        image: chifamba/bolt-ai:development
+        ports:
+        - containerPort: 5173
+        envFrom:
+        - secretRef:
+            name: bolt-ai-secrets
+        - configMapRef:
+          name: bolt-env-config
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "host.docker.internal"

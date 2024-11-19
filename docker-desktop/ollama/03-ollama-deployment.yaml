@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: ollama
+  labels:
+    app: ollama
+    version: v1.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+        version: v1.0
+    spec:
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        imagePullPolicy: Always  # Always pull the latest image
+        ports:
+        - containerPort: 11434
+          name: http
+          protocol: TCP
+        resources:          # Add resource requests and limits
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 4096m
+            memory: 6Gi
+        volumeMounts:
+        - name: ollama-storage
+          mountPath: /data/models
+        envFrom:
+        - configMapRef:
+            name: ollama-config
+        livenessProbe:     # Add liveness probe
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 20
+        readinessProbe:    # Add readiness probe
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      volumes:
+      - name: ollama-storage
+        persistentVolumeClaim:
+          claimName: ollama-pvc
+      - name: ollama-model-config
+        configMap:
+          name: ollama-model-config
+      restartPolicy: Always
+      # initContainers:
+      #   - name: model-initializer
+      #     image: ollama/ollama
+      #     command: ["/bin/sh", "-c"]
+      #     args:
+      #       - |
+      #         ollama pull qwen2.5-coder:7b
+      #         ollama create qwen2.5-coder:7b -f /data/models/ollama-model-config/Modelfile
+      #     volumeMounts:
+      #       - name: ollama-model-config
+      #         mountPath: /data/models/ollama-model-config
+      #       - name: ollama-storage
+      #         mountPath: /data/models
+      #     envFrom:
+      #       - configMapRef:
+      #           name: ollama-config
+

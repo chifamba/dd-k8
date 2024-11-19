@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: ollama-destination-rule
+  namespace: ollama
+  labels:
+    version: v1.0
+spec:
+  host: ollama-service
+  trafficPolicy:
+    tls:
+      mode: SIMPLE 
+      credentialName: ollama-tls-secret
+    portLevelSettings: # Add this block
+    - port:
+        number: 11434
+      tls:
+        mode: DISABLE

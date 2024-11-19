@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdrant-service
+  namespace: ollama
+  labels:
+    version: v1.0
+spec:
+  type: ClusterIP
+  selector:
+    app: qdrant
+  ports:
+  - port: 6333
+    name: http-6333
+    protocol: TCP
+    targetPort: 6333

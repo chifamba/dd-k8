@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      volumes:
+        - name: ollama-model-config
+          configMap:
+            name: ollama-model-config
+        - name: ollama-models
+          persistentVolumeClaim:
+            claimName: ollama-pvc 
+      initContainers:
+        - name: model-initializer
+          image: ollama/ollama
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              model_id=$(cat /ollama-model-config/Modelfile | grep FROM | awk '{print $2}')
+              ollama create $model_id /ollama-model-config/Modelfile
+          volumeMounts:
+            - name: ollama-model-config
+              mountPath: /ollama-model-config
+            - name: ollama-models
+              mountPath: /var/lib/ollama
+      containers:
+        - name: ollama
+          image: ollama/ollama
+          ports:
+            - containerPort: 11434  # HTTP
+            - containerPort: 11435  # GRPC
+          volumeMounts:
+            - name: ollama-models
+              mountPath: /var/lib/ollama          
+          resources:
+            limits:
+              memory: 8Gi
+              cpu: 8192m
+            requests:
+              memory: 4Gi
+              cpu: 250m
+      restartPolicy: Always

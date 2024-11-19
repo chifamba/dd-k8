@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ollama-model-initializer
+  namespace: ollama  # Make sure the job runs in the same namespace
+spec:
+  completions: 1 
+  backoffLimit: 3  # Allow up to 3 restart attempts
+  template:
+    metadata:
+      labels:
+        app: ollama-initializer
+    spec:
+      volumes:
+        - name: ollama-model-config
+          configMap:
+            name: ollama-model-config
+        - name: ollama-storage
+          persistentVolumeClaim:
+            claimName: ollama-pvc
+      containers:
+      - name: model-initializer
+        image: ollama/ollama 
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            export OLLAMA_HOST=ollama-service:11434
+            ollama pull qwen2.5-coder:7b
+            ollama pull llama3.2
+            ollama pull snowflake-arctic-embed
+            ollama create qwen2.5-coder:7b-32k -f /data/models/ollama-model-config/Modelfile
+            ollama list
+        volumeMounts:
+          - name: ollama-model-config
+            mountPath: /data/models/ollama-model-config
+          - name: ollama-storage
+            mountPath: /data/models
+        envFrom:
+          - configMapRef:
+              name: ollama-config
+      restartPolicy: OnFailure 

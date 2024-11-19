@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bolt-ai
+  namespace: bolt-ai
+  labels:
+    version: v1.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bolt-ai
+  template:
+    metadata:
+      labels:
+        app: bolt-ai
+    spec:
+      containers:
+      - name: bolt-ai
+        image: chifamba/bolt-ai:241117.01
+        ports:
+        - containerPort: 5173
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 4096m
+            memory: 2Gi
+        envFrom:
+        - configMapRef:
+            name: bolt-env-config
+        - secretRef:
+            name: bolt-ai-secrets
+

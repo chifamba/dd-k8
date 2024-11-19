@@ -1,0 +1,59 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: ollama-virtual-service
+  namespace: ollama
+  labels:
+    version: v1.3
+    app: ollama
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ollama-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /ollama/api
+    rewrite:
+      uri: /api
+    route:
+    - destination:
+        host: ollama-service
+        port:
+          number: 11434
+  - match:
+    - uri:
+        prefix: /agents/agent-1/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: agent-1-service
+        port:
+          number: 8000
+    timeout: 480s
+    retries:
+      attempts: 3
+      perTryTimeout: 240s
+      retryOn: connect-failure,refused-stream,unavailable,cancelled,resource-exhausted
+  - match:
+    - uri:
+        prefix: /agents/agent-2/
+    rewrite:
+      uri: /run
+    route:
+    - destination:
+        host: agent-2-service
+        port:
+          number: 8000
+    timeout: 480s
+    retries:
+      attempts: 2
+      perTryTimeout: 240s
+      retryOn: connect-failure,refused-stream,unavailable,cancelled,resource-exhausted
+  - route:
+    - destination:
+        host: ollama-service
+        port:
+          number: 11434

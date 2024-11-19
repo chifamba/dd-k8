@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ollama-config
+  namespace: ollama
+  labels:
+    version: v1.0
+data:
+  # Add your environment variables here
+  # Example:
+  OLLAMA_MODELS: "/data/models"

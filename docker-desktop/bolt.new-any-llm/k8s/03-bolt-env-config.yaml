@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bolt-env-config
+  namespace: bolt-ai
+  labels:
+    version: v1.0
+data:
+  # Add your environment variables here
+  # Example:
+  NODE_ENV: "development"
+  VITE_HMR_PROTOCOL: "ws"
+  VITE_HMR_HOST: "localhost"
+  VITE_HMR_PORT: "5173"
+  CHOKIDAR_USEPOLLING: "true"
+  WATCHPACK_POLLING: "true"
+  PORT: "5173"
+  VITE_LOG_LEVEL: "debug"
+  RUNNING_IN_DOCKER: "true"
+  OLLAMA_API_BASE_URL: "http://ollama-service.ollama.svc.cluster.local:11434"

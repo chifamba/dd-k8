@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apikey-configmap
+  namespace: ollama
+  labels:
+    version: v1.0.2
+data:
+  apikey.json: |-
+    {
+       "google_api_key": "AIzaSyAV6WOb1_Zwp7lnZDRHWBMuNJvfrqntv3M",
+      "google_cse_id": "007b6aa268bee40ec"
+    } 
+  

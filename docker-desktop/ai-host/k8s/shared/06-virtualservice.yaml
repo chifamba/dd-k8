@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: ollama-virtual-service
+  namespace: ollama
+  labels:
+    version: v1.3
+    app: ollama
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ollama-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: n8n-service
+        port:
+          number: 5678
+  - route:
+    - destination:
+        host: n8n-service
+        port:
+          number: 11434

@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: ollama-service-entry
+  namespace: ollama
+  labels:
+    version: v1.0
+spec:
+  hosts:
+  - "*.huggingface.co"
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  - number: 443
+    name: https
+    protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: NONE
